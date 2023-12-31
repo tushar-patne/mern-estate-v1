@@ -15,25 +15,25 @@ export const signup = async (req, res, next) => {
             newUser
         });
     } catch (error) {
-        next(error);
+        return next(error);
     }
 };
 
 
 export const signin = async (req, res, next) => {
-    const {email, password} = req.body;
     try {
+        const {email, password} = req.body;
         const validUser = await User.findOne({email});
         if(!validUser){
-            next(errorHandler(404, "User not found!"));
+            return next(errorHandler(404, "User not found!"));
         }
         console.log(validUser.password);
         const validPassword = bcryptjs.compareSync(password, validUser.password);
         if(!validPassword){
-            next(errorHandler(401, "Wrong credentials!"));
+            return next(errorHandler(401, "Wrong credentials!"));
         }
         const {password: hashedPassword, ...userInfoWithoutPassword} = validUser._doc;
-        const token = jwt.sign({id: validUser._id}, process.env.JWT_TOKEN);
+        const token = jwt.sign({id: validUser._id}, process.env.JWT_SECRETE);
         const expiryDate = Date(Date.now() + 3600000);
         res
             .cookie('access_token', token, {expire: expiryDate, httpOnly: true})
@@ -44,6 +44,6 @@ export const signin = async (req, res, next) => {
                 userInfoWithoutPassword
             })
     } catch (error) {
-        next(error);
+        return next(error);
     }
 }
