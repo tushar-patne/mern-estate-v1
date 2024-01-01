@@ -33,15 +33,43 @@ export const signin = async (req, res, next) => {
         }
         const {password: hashedPassword, ...userInfoWithoutPassword} = validUser._doc;
         const token = jwt.sign({id: validUser._id}, process.env.JWT_SECRETE);
-        const expiryDate = Date(Date.now() + 3600000);
         res
-            .cookie('access_token', token, {expire: expiryDate, httpOnly: true})
+            .cookie('access_token', token, {httpOnly: true})
             .status(200)
             .json({
                 success: true,
                 message: "User login successful",
                 userInfoWithoutPassword
             })
+    } catch (error) {
+        return next(error);
+    }
+}
+
+export const google = async (req, res, next) => {
+    try {
+        const user = await User.findOne({email: req.body.email});
+        if(user){
+            const token = jwt.sign({id: user.id}, process.env.JWT_SECRETE);
+            const {password: pass, ...userInfoWithoutPassword} = user._doc;
+            res
+                .cookie('access_token', token, {httpOnly: true})
+                .status(200)
+                .json(userInfoWithoutPassword);
+        }
+        else{
+            const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+            const username = req.body.name.split(" ").join("").toLowerCase() + Math.random().toString(36).slice(-4);
+            const newUser = new User({username: username, email: req.body.email, password: hashedPassword, avatar: req.body.photo});
+            await newUser.save();
+            const token = jwt.sign({id: newUser._id}, process.env.JWT_SECRETE);
+            const {password: pass, ...userInfoWithoutPassword} = newUser._doc;
+            res
+                .cookie('access_token', token, {httpOnly: true})
+                .status(200)
+                .json(userInfoWithoutPassword);
+        }
     } catch (error) {
         return next(error);
     }
