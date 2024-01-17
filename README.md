@@ -115,7 +115,7 @@ To run this project locally, follow these steps:
 - Node.js
 - Express.js
 - MongoDB for the database
-- Mongoose ORM for MongoDB interactions
+- Mongoose ODM for MongoDB interactions
 - JSON Web Tokens (JWT) for authentication
 
 ## Acknowledgements
@@ -128,4 +128,8 @@ Thank you, Sahand!
 
 
 If you find this project helpful or have any suggestions for improvement, please feel free to share your feedback.
+
+## Show Your Support
+
+If you find this project helpful or interesting, your support would mean a lot! Please consider giving it a star [🌟](https://github.com/TejasPatne/mern-estate).
 
